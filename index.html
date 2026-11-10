@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mesas ao pé do bar</title>
+<style>
+:root{--bg:#f5f1f0;--ink:#231f20;--muted:#6b6361;--accent:#e30713;--sun:#ce410c;--card:#fff;--room:#e8e3e1;--r:20px}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 "Avenir Next","Segoe UI",system-ui,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+main{max-width:520px;margin:0 auto;padding:16px 16px 40px;display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
+main>*{min-width:0}
+.carousel{position:relative;border-radius:var(--r);overflow:hidden;aspect-ratio:4/3;background:#231f20}
+.track{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.track::-webkit-scrollbar{display:none}
+.slide{position:relative;flex:0 0 100%;height:100%;scroll-snap-align:center;scroll-snap-stop:always;background:linear-gradient(160deg,#e30713,#7a0309)}
+.slide:nth-child(5n+2){background:linear-gradient(160deg,#81a215,#3d4d0a)}
+.slide:nth-child(5n+3){background:linear-gradient(160deg,#ce410c,#6b2006)}
+.slide:nth-child(5n+4){background:linear-gradient(160deg,#26ad08,#0f4a03)}
+.slide:nth-child(5n+5){background:linear-gradient(160deg,#e30713,#ce410c)}
+.slide .ph{position:absolute;inset:0;display:grid;place-items:center;color:#ffffffb0;font-weight:700;font-size:1.1rem}
+.slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.dots{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;gap:8px;pointer-events:none}
+.dots button{pointer-events:auto;width:10px;height:10px;padding:0;border:0;border-radius:99px;background:#ffffff90;transition:width .2s}
+.dots button[aria-current="true"]{width:24px;background:#fff}
+.nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:#ffffffd9;color:var(--ink);font-size:22px;line-height:1;cursor:pointer}
+.nav.prev{left:8px}.nav.next{right:8px}
+@media (hover:none){.nav{display:none}}
+h1{font-size:2rem;line-height:1.1;letter-spacing:-.02em}
+.lead{color:var(--muted);margin-top:8px}
+h2{font-size:1.15rem;margin-bottom:10px}
+.video,.map{background:var(--card);border-radius:var(--r);padding:12px}
+video{width:100%;display:block;border-radius:12px;background:#231f20;aspect-ratio:1/1}
+.novideo{display:none;padding:18px;text-align:center;color:var(--muted);font-size:.95rem}
+.circles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
+.circle b{display:grid;place-items:center;width:84px;height:84px;margin:0 auto 8px;border-radius:50%;background:var(--accent);color:#fff}
+.circle svg{width:38px;height:38px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.circle span{font-size:.9rem;line-height:1.3;display:block;overflow-wrap:anywhere}
+.scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;border-radius:12px;background:#fff;-webkit-overflow-scrolling:touch}
+#mapa{display:block;min-width:100%;height:auto}
+#route{fill:none;stroke:#26ad08;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:2 10;vector-effect:non-scaling-stroke;animation:flow 1.2s linear infinite}
+.room{fill:var(--room)}
+.corr{fill:#fff}
+.lbl{font-size:15px;fill:var(--muted);font-family:inherit;text-anchor:middle}
+.tag{fill:none;stroke:#26ad08;stroke-width:3}
+#start{fill:var(--ink);stroke:#fff;stroke-width:3;vector-effect:non-scaling-stroke}
+#pulse{fill:none;stroke:var(--ink);stroke-width:3;vector-effect:non-scaling-stroke;transform-box:fill-box;transform-origin:center;animation:ping 1.8s ease-out infinite}
+@keyframes ping{from{transform:scale(.7);opacity:1}to{transform:scale(2);opacity:0}}
+.share{display:grid;gap:8px;justify-items:center;text-align:center}
+.share button{width:100%;max-width:360px;min-height:48px;border:0;border-radius:99px;background:var(--accent);color:#fff;font-weight:700;font-size:1rem;font-family:inherit;cursor:pointer}
+.share button:active{transform:scale(.98)}
+.share p{color:var(--muted);font-size:.95rem}
+.hint{margin-top:6px;font-size:.85rem;color:var(--muted)}
+@keyframes flow{to{stroke-dashoffset:-12}}
+.caption{margin-top:8px;color:var(--muted);font-size:.95rem}
+@media (prefers-reduced-motion:reduce){#route,#pulse{animation:none}}
+@media (min-width:900px){
+ body{padding:32px}
+ main{max-width:960px;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+  .video{grid-column:1/-1}
+ .video video{max-width:640px;margin:0 auto}
+ .map{grid-column:1/-1}
+ .circles{grid-column:1/-1}
+ .share{grid-column:1/-1}
+}
+</style>
+</head>
+<body>
+<main>
+
+  <section class="carousel" role="region" aria-roledescription="carrossel" aria-label="Fotografias das mesas ao pé do bar">
+    <div class="track" id="track"></div>
+    <button class="nav prev" id="prev" type="button" aria-label="Foto anterior">‹</button>
+    <button class="nav next" id="next" type="button" aria-label="Foto seguinte">›</button>
+    <div class="dots" id="dots"></div>
+  </section>
+
+  <section class="intro">
+    <h1>Mesas ao pé do bar</h1>
+    <p class="lead">Encontraste um sítio novo da tua escola. Aqui podes estudar, fazer trabalhos ou simplesmente conviver! Precisas de um sítio mais escuro para descansares no intervalo? Senta-te aqui. Tens que fazer um design ou detalhe? Podes ligar a luz! Cada mesa tem 3 bancos, 3 fichas e 1 entrada usb-c! Não te deixes só por aí, se quiseres ler também temos material à tua direita ou esquerda.</p>
+  </section>
+
+  <section class="map">
+    <h2>Como chegar</h2>
+    <div class="scroll" id="scroll">
+      <svg id="mapa" role="img" aria-label="Mapa do caminho até ao destino">
+        <rect x="0" y="0" width="1174" height="387" fill="#f5f1f0"/>
+        <rect class="corr" x="0" y="118" width="1040" height="82" rx="6"/>
+        <g id="salas"></g>
+        <polyline id="route" points=""/>
+        <g id="pin" transform="translate(281 161)">
+          <path d="M0 0C-4-6-18-24-18-32a18 18 0 1 1 36 0C18-24 4-6 0 0Z" fill="#e30713"/>
+          <path d="M0 0C4-6 16-20 17.6-28 17-18 8-8 0 0Z" fill="#c10510"/>
+          <path d="M-14.5-38A15 15 0 0 1-1-47" fill="none" stroke="#f06a6a" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="0" cy="-32" r="7.5" fill="#fff"/>
+        </g>
+        <g id="tags"></g>
+        <circle id="pulse" r="12"/>
+        <circle id="start" r="11"/>
+      </svg>
+    </div>
+    <p class="caption" id="caption"></p>
+    <p class="hint" id="hint" hidden>Desliza o mapa para ver o caminho completo.</p>
+  </section>
+
+  <section class="circles" aria-label="Informações úteis">
+    <div class="circle">
+      <b><svg viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5zM12 6.5v13"/></svg></b>
+      <span>Perfeito para estudar</span>
+    </div>
+    <div class="circle">
+      <b><svg viewBox="0 0 24 24"><path d="M9 3v5M15 3v5M6 8h12v3a6 6 0 0 1-12 0zM12 17v4"/></svg></b>
+      <span>3 fichas por mesa e 1 entrada USB‑C</span>
+    </div>
+    <div class="circle">
+      <b><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg></b>
+      <span>Luz para trabalhar</span>
+    </div>
+  </section>
+
+  <section class="video">
+    <h2>Se não encontraste o sítio</h2>
+    <video id="video" controls playsinline preload="metadata" aria-label="Vídeo com o caminho até às mesas ao pé do bar"></video>
+    <p class="novideo" id="novideo">O vídeo ainda não está disponível. Segue o mapa acima.</p>
+  </section>
+
+  <section class="share">
+    <p id="proxima" hidden></p>
+    <button id="share" type="button">Partilhar com um colega</button>
+  </section>
+
+</main>
+
+<script>
+/* ============ 1. MAPA (esquema da planta) ============
+   Coordenadas em pixéis da planta original (1174 x 387).
+   salas:   retângulos. "nome" é opcional.
+   destino: o ícone de localização. "no" é o ponto do corredor a que liga.
+   nos:     pontos ao longo do corredor e com quem se ligam. O caminho de cada
+            etiqueta até ao destino é calculado sozinho. */
+const MAPA = {
+  destino: { nome:"Mesas ao pé do bar", p:[281,161], no:"estrela", proxima:"" },  /* proxima: texto opcional, ex.: "Próxima descoberta: a sala de estudo do piso 1" */
+  salas: [
+    { x:90,  y:50,  w:110, h:68 },
+    { x:230, y:20,  w:100, h:98, nome:"Átrio" },
+    { x:375, y:50,  w:95,  h:68, nome:"WC" },
+    { x:515, y:50,  w:95,  h:68, nome:"WC" },
+    { x:618, y:40,  w:184, h:78 },
+    { x:808, y:70,  w:232, h:48 },
+    { x:180, y:200, w:195, h:170, nome:"Refeitório" },
+    { x:385, y:200, w:90,  h:60 },
+    { x:490, y:200, w:110, h:60 },
+    { x:607, y:200, w:98,  h:160, nome:"Auditório 1" },
+    { x:710, y:200, w:95,  h:160, nome:"Auditório 2" },
+    { x:810, y:200, w:85,  h:50 },
+    { x:905, y:200, w:120, h:50 },
+    { x:1040,y:150, w:100, h:160, nome:"Auditório 3" }
+  ],
+  nos: {
+    estrela: { p:[281,159], liga:["c1"] },
+    c1: { p:[357,159], liga:["estrela","c2"] },
+    c2: { p:[644,159], liga:["c1","c3"] },
+    c3: { p:[767,159], liga:["c2","c4"] },
+    c4: { p:[862,159], liga:["c3","c5"] },
+    c5: { p:[996,159], liga:["c4"] }
+  }
+};
+
+/* ============ 2. ETIQUETAS NFC (figuras verdes) ============
+   p:  posição da etiqueta na planta.   no: ponto do corredor mais próximo.
+   Etiqueta NFC → index.html?origem=ponto1  (ponto2, ponto3, ...) */
+const ORIGENS = {
+  ponto1: { nome:"Ponto 1", p:[357,194], no:"c1", video:"videos/ponto1.mp4",
+            texto:"Segue o corredor para a esquerda até chegares ao ícone vermelho no mapa." },
+  ponto2: { nome:"Ponto 2", p:[644,132], no:"c2", video:"videos/ponto2.mp4",
+            texto:"Segue o corredor para a esquerda até chegares ao ícone vermelho no mapa." },
+  ponto3: { nome:"Ponto 3", p:[767,132], no:"c3", video:"videos/ponto3.mp4",
+            texto:"Segue o corredor para a esquerda até chegares ao ícone vermelho no mapa." },
+  ponto4: { nome:"Ponto 4", p:[862,181], no:"c4", video:"videos/ponto4.mp4",
+            texto:"Segue o corredor para a esquerda até chegares ao ícone vermelho no mapa." },
+  ponto5: { nome:"Ponto 5", p:[996,184], no:"c5", video:"videos/ponto5.mp4",
+            texto:"Segue o corredor para a esquerda até chegares ao ícone vermelho no mapa." }
+};
+
+/* ============ 3. LÓGICA (não precisa de mexer) ============ */
+const NS = "http://www.w3.org/2000/svg", IMG = [1174, 387];
+const el = (tag, attrs, pai) => {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (pai) pai.append(e); return e;
+};
+
+function caminhoNos(de, para){            // pesquisa em largura no grafo do corredor
+  const fila = [[de]], visto = new Set([de]);
+  while (fila.length){
+    const rota = fila.shift(), atual = rota[rota.length-1];
+    if (atual === para) return rota;
+    for (const n of MAPA.nos[atual].liga)
+      if (!visto.has(n)){ visto.add(n); fila.push([...rota, n]); }
+  }
+  return [];
+}
+
+const params = new URLSearchParams(location.search);
+const chave = (params.get("origem") || "ponto1").toLowerCase();
+const o = ORIGENS[chave] || ORIGENS.ponto1;
+
+/* Salas */
+const gSalas = document.getElementById("salas");
+for (const s of MAPA.salas){
+  el("rect", { class:"room", x:s.x, y:s.y, width:s.w, height:s.h, rx:6 }, gSalas);
+  if (s.nome){
+    const t = el("text", { class:"lbl", x:s.x + s.w/2, y:s.y + s.h/2 + 5 }, gSalas);
+    t.textContent = s.nome;
+  }
+}
+
+/* Outras etiquetas (pontos pequenos) */
+const gTags = document.getElementById("tags");
+for (const k in ORIGENS)
+  if (ORIGENS[k] !== o) el("circle", { class:"tag", cx:ORIGENS[k].p[0], cy:ORIGENS[k].p[1], r:8 }, gTags);
+
+/* Destino: ícone de localização (a ponta fica no ponto do destino) */
+document.getElementById("pin").setAttribute("transform", "translate(" + MAPA.destino.p.join(" ") + ")");
+
+/* Percurso */
+const pontos = [o.p, ...caminhoNos(o.no, MAPA.destino.no).map(n => MAPA.nos[n].p), MAPA.destino.p]
+  .filter((p, i, a) => i === 0 || p[0] !== a[i-1][0] || p[1] !== a[i-1][1]);
+document.getElementById("route").setAttribute("points", pontos.map(p => p.join(",")).join(" "));
+for (const id of ["start", "pulse"]){
+  const e = document.getElementById(id); e.setAttribute("cx", o.p[0]); e.setAttribute("cy", o.p[1]);
+}
+
+/* Enquadra o mapa à volta do percurso */
+const xs = pontos.map(p => p[0]), centro = (Math.min(...xs) + Math.max(...xs)) / 2;
+const largura = Math.min(IMG[0], Math.max(460, Math.max(...xs) - Math.min(...xs) + 160));
+const vx = Math.max(0, Math.min(IMG[0] - largura, centro - largura / 2));
+const svg = document.getElementById("mapa");
+svg.setAttribute("viewBox", [vx, 90, largura, 220].join(" "));
+svg.style.width = "100%";
+
+document.getElementById("caption").textContent = o.texto;
+
+/* ============ Carrossel (5 fotos: imagens/foto1.jpg ... foto5.jpg) ============ */
+const FOTOS = ["imagens/foto1.jpg","imagens/foto2.jpg","imagens/foto3.jpg","imagens/foto4.jpg","imagens/foto5.jpg"];
+const track = document.getElementById("track"), dots = document.getElementById("dots");
+FOTOS.forEach((src, i) => {
+  const s = document.createElement("div");
+  s.className = "slide"; s.setAttribute("role", "group"); s.setAttribute("aria-label", (i+1) + " de " + FOTOS.length);
+  const ph = document.createElement("span"); ph.className = "ph"; ph.textContent = "Foto " + (i+1);
+  const im = new Image(); im.alt = "Mesas ao pé do bar, foto " + (i+1); im.loading = i ? "lazy" : "eager";
+  im.onerror = () => im.remove(); im.src = src;
+  s.append(ph, im); track.append(s);
+  const d = document.createElement("button"); d.type = "button"; d.setAttribute("aria-label", "Ir para a foto " + (i+1));
+  d.onclick = () => track.scrollTo({ left: i * track.clientWidth, behavior: "smooth" });
+  dots.append(d);
+});
+const marcar = () => {
+  const i = Math.round(track.scrollLeft / track.clientWidth);
+  [...dots.children].forEach((d, k) => d.setAttribute("aria-current", k === i ? "true" : "false"));
+};
+track.addEventListener("scroll", marcar, { passive: true }); marcar();
+document.getElementById("prev").onclick = () => track.scrollBy({ left: -track.clientWidth, behavior: "smooth" });
+document.getElementById("next").onclick = () => track.scrollBy({ left: track.clientWidth, behavior: "smooth" });
+let pausadoAte = 0;
+document.querySelector(".carousel").addEventListener("pointerdown", () => { pausadoAte = Date.now() + 8000; });
+if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+  setInterval(() => {
+    if (document.hidden || Date.now() < pausadoAte || document.querySelector(".carousel:hover") || document.activeElement.closest(".carousel")) return;
+    const atual = Math.round(track.scrollLeft / track.clientWidth);
+    track.scrollTo({ left: ((atual + 1) % FOTOS.length) * track.clientWidth, behavior: "smooth" });
+  }, 5000);
+}
+
+/* Fim da experiência: sugerir a próxima descoberta (se existir) e partilhar com um colega */
+if (MAPA.destino.proxima){ const pr = document.getElementById("proxima"); pr.textContent = MAPA.destino.proxima; pr.hidden = false; }
+const botao = document.getElementById("share");
+botao.addEventListener("click", async () => {
+  const url = location.origin + location.pathname;      // sem ?origem, para o colega ver a página base
+  const dados = { title: document.title, text: "Descobri este sítio na escola. Há mais para descobrir!", url };
+  try {
+    if (navigator.share) await navigator.share(dados);
+    else { await navigator.clipboard.writeText(url); botao.textContent = "Ligação copiada!"; }
+  } catch (e) { /* o utilizador cancelou */ }
+});
+
+const v = document.getElementById("video");
+v.src = o.video;
+v.addEventListener("error", () => {
+  v.style.display = "none";
+  document.getElementById("novideo").style.display = "block";
+}, true);
+</script>
+</body>
+</html>
